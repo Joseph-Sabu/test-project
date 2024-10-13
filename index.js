@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Configure MSSQL
-const config = {
+/*const config = {
    server: 'LAPTOP-JQSP6PRO',  // Your SQL Server instance
    database: 'BPMeasurements',              // Your database name
    options: {
@@ -27,7 +27,7 @@ sql.connect(config, (err) => {
    } else {
        console.log('Connected to the database');
    }
-});
+}); */
 
 // Configure Multer for file uploads
 const upload = multer({ dest: 'uploads/' });
@@ -38,6 +38,12 @@ app.post('/upload', upload.single('file'), (req, res) => {
    const workbook = xlsx.readFile(filePath);
    const sheet = workbook.Sheets[workbook.SheetNames[0]];
    const data = xlsx.utils.sheet_to_json(sheet);
+
+   console.log("Simulated data",data);
+
+   data.forEach(device => {
+   console.log(`Simulated individual data: Name: ${device.Name}, IP: ${device.IP}`);   
+   });
 
    data.forEach(device => {
       const query = `INSERT INTO Servers (name, ip_address) VALUES ('${device.Name}', '${device.IP}')`;
