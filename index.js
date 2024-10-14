@@ -17,7 +17,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const data = xlsx.utils.sheet_to_json(sheet);
 
-    console.log("Simulated data", data);
+    //console.log("Simulated data", data);
 
     // Create nodes and links from the data
     const nodes = data.map(device => ({ id: device.Name, ip: device.IP }));
@@ -38,11 +38,19 @@ app.post('/upload', upload.single('file'), (req, res) => {
   });
 
     // Log nodes and links for debugging
-    console.log("Nodes:", nodes);
-    console.log("Links:", links);
+    //console.log("Nodes:", nodes);
+    //console.log("Links:", links);
+   
+   // Log the JSON response body to console
+   const responseBody = { nodes, links };
+   console.log('Response JSON:', JSON.stringify(responseBody, null, 2)); // Pretty print JSON
+
+   // Send the response
+   res.json(responseBody);
+
 
     // Send the nodes and links back to the frontend
-    res.json({ nodes, links });
+    //res.json({ nodes, links });
 });
 
 // Serve the frontend HTML page
