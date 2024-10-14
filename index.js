@@ -7,10 +7,10 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Configure Multer for file uploads
+// Configuring Multer for file uploads
 const upload = multer({ dest: 'uploads/' });
 
-// Handle Excel upload and process the file
+// Handling Excel upload and process the file
 app.post('/upload', upload.single('file'), (req, res) => {
     const filePath = req.file.path;
     const workbook = xlsx.readFile(filePath);
@@ -27,7 +27,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
       if (device.ConnectsTo) {
           const connectedServers = device.ConnectsTo.split(',').map(name => name.trim());
           connectedServers.forEach(target => {
-              // Check if the target exists in the nodes
+              // Checking if the target exists in the nodes
               if (nodes.some(node => node.id === target)) {
                   links.push({ source: device.Name, target: target, value: 10 });
               } else {
@@ -48,9 +48,6 @@ app.post('/upload', upload.single('file'), (req, res) => {
    // Send the response
    res.json(responseBody);
 
-
-    // Send the nodes and links back to the frontend
-    //res.json({ nodes, links });
 });
 
 // Serve the frontend HTML page

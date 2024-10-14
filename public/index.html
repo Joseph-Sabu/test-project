@@ -27,23 +27,23 @@
 
         // Function to draw the network diagram
         function drawDiagram({ nodes, links }) {
-            svg.selectAll("*").remove(); // Clear previous diagram
+            svg.selectAll("*").remove();
 
-            // Set up the simulation with forces
+            // Setting up the simulation with forces
             const simulation = d3.forceSimulation(nodes)
-                .force("link", d3.forceLink(links).id(d => d.id).distance(150))  // Link force
-                .force("charge", d3.forceManyBody().strength(-300))               // Repulsion force
-                .force("center", d3.forceCenter(width / 2, height / 2))          // Centering force
+                .force("link", d3.forceLink(links).id(d => d.id).distance(150))  
+                .force("charge", d3.forceManyBody().strength(-300))
+                .force("center", d3.forceCenter(width / 2, height / 2))
                 .on("tick", ticked)
                 .on("end", () => {
-                    // After simulation has stabilized, fix node positions
+                    // After simulation has stabilized, fixing the node positions
                     nodes.forEach(d => {
                         d.fx = d.x;
                         d.fy = d.y;
                     });
                 });
 
-            // Create links (lines)
+            // Creating links
             const link = svg.append("g")
                 .attr("stroke", "#999")
                 .attr("stroke-opacity", 0.6)
@@ -52,7 +52,7 @@
                 .enter().append("line")
                 .attr("stroke-width", d => Math.sqrt(d.value));
 
-            // Create nodes (circles)
+            // Creating nodes
             const node = svg.append("g")
                 .attr("stroke", "#fff")
                 .attr("stroke-width", 1.5)
@@ -66,48 +66,14 @@
                     .on("drag", dragged)
                     .on("end", dragended));
 
-            // Add labels to the nodes
-            /* const label = svg.append("g")
-                .attr("class", "labels")
-                .selectAll("text")
-                .data(nodes)
-                .enter().append("text")
-                .attr("dx", 12)
-                .attr("dy", ".35em")
-                .text(d => d.id);
+    
 
-            // Define the tick function for the simulation
-            function ticked() {
-                link
-                    .attr("x1", d => d.source.x)
-                    .attr("y1", d => d.source.y)
-                    .attr("x2", d => d.target.x)
-                    .attr("y2", d => d.target.y);
-            
-                node
-                    .attr("cx", d => {
-                        // Constrain x position
-                        d.x = Math.max(10, Math.min(width - 10, d.x)); // 10px padding
-                        return d.x;
-                    })
-                    .attr("cy", d => {
-                        // Constrain y position
-                        d.y = Math.max(10, Math.min(height - 10, d.y)); // 10px padding
-                        return d.y;
-                    });
-            
-                label
-                    .attr("x", d => d.x)
-                    .attr("y", d => d.y);
-            } */
-
-
-            // Add labels (node name and IP address) to the nodes
+            // Adding labels (node name and IP address) to the nodes
             const label = svg.append("g")
             .attr("class", "labels")
             .selectAll("g")
             .data(nodes)
-            .enter().append("g");  // Group for each label
+            .enter().append("g");
 
             // Node Name
             label.append("text")
@@ -115,13 +81,13 @@
             .attr("dy", ".35em")
             .text(d => d.id);
 
-            // IP Address (placed slightly below the node name)
+            // IP Address
             label.append("text")
             .attr("dx", 12)
-            .attr("dy", "1.75em")  // Offset the IP address further down
+            .attr("dy", "1.75em")
             .text(d => d.ip);
 
-            // Define the tick function for the simulation
+            // Defining the tick function for the simulation
             function ticked() {
             link
                 .attr("x1", d => d.source.x)
@@ -131,15 +97,15 @@
 
             node
                 .attr("cx", d => {
-                    d.x = Math.max(10, Math.min(width - 10, d.x)); // Constrain x position
+                    d.x = Math.max(10, Math.min(width - 10, d.x));
                     return d.x;
                 })
                 .attr("cy", d => {
-                    d.y = Math.max(10, Math.min(height - 10, d.y)); // Constrain y position
+                    d.y = Math.max(10, Math.min(height - 10, d.y));
                     return d.y;
                 });
 
-            // Update the position of both labels (name and IP address)
+            // Updating the position of both labels (name and IP address)
             label
                 .attr("transform", d => `translate(${d.x},${d.y})`);
             }
@@ -153,20 +119,20 @@
 
             function dragged(event, d) {
                 // Constrain the x and y position of the node within the SVG boundaries
-                d.fx = Math.max(10, Math.min(width - 10, event.x));  // Constrain x position
-                d.fy = Math.max(10, Math.min(height - 10, event.y)); // Constrain y position
+                d.fx = Math.max(10, Math.min(width - 10, event.x));
+                d.fy = Math.max(10, Math.min(height - 10, event.y));
             
-                // Update the node's position in the visualization
+                // Updating the node's position in the visualization
                 d3.select(this)
                     .attr("cx", d.fx)
                     .attr("cy", d.fy);
             
-                // Update the label's position along with the node
+                // Updating the label's position along with the node
                 label
                     .filter(l => l.id === d.id)
                     .attr("transform", `translate(${d.fx},${d.fy})`);
             
-                // Update the links dynamically while dragging
+                // Updating the links dynamically while dragging
                 svg.selectAll("line")
                     .filter(l => l.source.id === d.id || l.target.id === d.id)
                     .attr("x1", l => l.source.fx)
@@ -177,18 +143,14 @@
 
             function dragended(event, d) {
                 // Keep the node fixed at the new position
-                // If you want the node to be free again, uncomment the next two lines
-                // d.fx = null;
-                // d.fy = null;
-
-                // Optional: Reset visual feedback
+                
                 d3.select(this).attr("stroke", "#fff");
             }
         }
 
         // Handle the form submission
         document.getElementById('uploadForm').onsubmit = async function(event) {
-            event.preventDefault(); // Prevent default form submission
+            event.preventDefault();
             const formData = new FormData(this);
             const response = await fetch('/upload', {
                 method: 'POST',
@@ -196,8 +158,9 @@
             });
 
             if (response.ok) {
-                const data = await response.json(); // Expecting a JSON response
-                drawDiagram(data); // Draw the network diagram with received data
+                const data = await response.json();
+                 // Draw the network diagram with received data
+                drawDiagram(data);
             } else {
                 console.error('Error uploading file:', response.statusText);
             }
