@@ -8,10 +8,11 @@
     <style>
         circle { fill: steelblue; }
         line { stroke: black; }
+        text { font: 10px sans-serif; }
     </style>
 </head>
 <body>
-    <h1>Network Diagram</h1>
+    <h1>Network Diagram Visualizer</h1>
     <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
         <input type="file" name="file" accept=".xlsx" />
         <button type="submit">Upload Excel</button>
@@ -23,17 +24,25 @@
         const svg = d3.select("svg"),
             width = +svg.attr("width"),
             height = +svg.attr("height");
-    
+
         // Function to draw the network diagram
         function drawDiagram({ nodes, links }) {
             svg.selectAll("*").remove(); // Clear previous diagram
-            
+
             // Set up the simulation with forces
             const simulation = d3.forceSimulation(nodes)
                 .force("link", d3.forceLink(links).id(d => d.id).distance(150))  // Link force
                 .force("charge", d3.forceManyBody().strength(-300))               // Repulsion force
-                .force("center", d3.forceCenter(width / 2, height / 2));          // Centering force
-    
+                .force("center", d3.forceCenter(width / 2, height / 2))          // Centering force
+                .on("tick", ticked)
+                .on("end", () => {
+                    // After simulation has stabilized, fix node positions
+                    nodes.forEach(d => {
+                        d.fx = d.x;
+                        d.fy = d.y;
+                    });
+                });
+
             // Create links (lines)
             const link = svg.append("g")
                 .attr("stroke", "#999")
@@ -42,7 +51,7 @@
                 .data(links)
                 .enter().append("line")
                 .attr("stroke-width", d => Math.sqrt(d.value));
-    
+
             // Create nodes (circles)
             const node = svg.append("g")
                 .attr("stroke", "#fff")
@@ -56,7 +65,7 @@
                     .on("start", dragstarted)
                     .on("drag", dragged)
                     .on("end", dragended));
-    
+
             // Add labels to the nodes
             const label = svg.append("g")
                 .attr("class", "labels")
@@ -66,43 +75,75 @@
                 .attr("dx", 12)
                 .attr("dy", ".35em")
                 .text(d => d.id);
-    
+
             // Define the tick function for the simulation
-            simulation.on("tick", () => {
+            function ticked() {
                 link
                     .attr("x1", d => d.source.x)
                     .attr("y1", d => d.source.y)
                     .attr("x2", d => d.target.x)
                     .attr("y2", d => d.target.y);
-    
+            
                 node
-                    .attr("cx", d => d.x)
-                    .attr("cy", d => d.y);
-    
+                    .attr("cx", d => {
+                        // Constrain x position
+                        d.x = Math.max(10, Math.min(width - 10, d.x)); // 10px padding
+                        return d.x;
+                    })
+                    .attr("cy", d => {
+                        // Constrain y position
+                        d.y = Math.max(10, Math.min(height - 10, d.y)); // 10px padding
+                        return d.y;
+                    });
+            
                 label
                     .attr("x", d => d.x)
                     .attr("y", d => d.y);
-            });
-    
+            }
+
             // Dragging functions for interactivity
             function dragstarted(event, d) {
-                if (!event.active) simulation.alphaTarget(0.3).restart();
-                d.fx = d.x;
-                d.fy = d.y;
+                // Optional: You can add visual feedback here (e.g., change node color)
+                // Bring the dragged node to the front
+                d3.select(this).raise().attr("stroke", "black");
             }
-    
+
             function dragged(event, d) {
-                d.fx = event.x;
-                d.fy = event.y;
+                // Constrain the x and y position of the node within the SVG boundaries
+                d.fx = Math.max(10, Math.min(width - 10, event.x));  // Constrain x position
+                d.fy = Math.max(10, Math.min(height - 10, event.y)); // Constrain y position
+            
+                // Update the node's position in the visualization
+                d3.select(this)
+                    .attr("cx", d.fx)
+                    .attr("cy", d.fy);
+            
+                // Update the label's position
+                svg.selectAll("text")
+                    .filter(l => l.id === d.id)
+                    .attr("x", d.fx)
+                    .attr("y", d.fy);
+            
+                // Update the links dynamically while dragging
+                svg.selectAll("line")
+                    .filter(l => l.source.id === d.id || l.target.id === d.id)
+                    .attr("x1", l => l.source.fx)
+                    .attr("y1", l => l.source.fy)
+                    .attr("x2", l => l.target.fx)
+                    .attr("y2", l => l.target.fy);
             }
-    
+
             function dragended(event, d) {
-                if (!event.active) simulation.alphaTarget(0);
-                d.fx = null;
-                d.fy = null;
+                // Keep the node fixed at the new position
+                // If you want the node to be free again, uncomment the next two lines
+                // d.fx = null;
+                // d.fy = null;
+
+                // Optional: Reset visual feedback
+                d3.select(this).attr("stroke", "#fff");
             }
         }
-    
+
         // Handle the form submission
         document.getElementById('uploadForm').onsubmit = async function(event) {
             event.preventDefault(); // Prevent default form submission
@@ -111,7 +152,7 @@
                 method: 'POST',
                 body: formData
             });
-    
+
             if (response.ok) {
                 const data = await response.json(); // Expecting a JSON response
                 drawDiagram(data); // Draw the network diagram with received data
@@ -120,6 +161,6 @@
             }
         };
     </script>
-    
+
 </body>
 </html>

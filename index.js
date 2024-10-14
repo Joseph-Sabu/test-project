@@ -24,13 +24,18 @@ app.post('/upload', upload.single('file'), (req, res) => {
     const links = [];
 
     data.forEach(device => {
-        if (device.ConnectsTo) {
-            const connectedServers = device.ConnectsTo.split(',').map(name => name.trim());
-            connectedServers.forEach(target => {
-                links.push({ source: device.Name, target: target, value: 10 }); // Adjust the value as needed
-            });
-        }
-    });
+      if (device.ConnectsTo) {
+          const connectedServers = device.ConnectsTo.split(',').map(name => name.trim());
+          connectedServers.forEach(target => {
+              // Check if the target exists in the nodes
+              if (nodes.some(node => node.id === target)) {
+                  links.push({ source: device.Name, target: target, value: 10 });
+              } else {
+                  console.warn(`Target node ${target} not found for ${device.Name}`);
+              }
+          });
+      }
+  });
 
     // Log nodes and links for debugging
     console.log("Nodes:", nodes);
