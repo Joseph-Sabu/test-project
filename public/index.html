@@ -13,13 +13,45 @@
 </head>
 <body>
     <h1>Network Diagram Visualizer</h1>
-
+    <br>
+    <h3>Upload Excel file</h3>
+    <p>To generate a diagram please upload an <b>xlsx</b> file with data in the following format: </p>
+    <table border="1" style="border-collapse: collapse; border: 1px solid black;">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>IP</th>
+                <th>ConnectsTo</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Server1</td>
+                <td>192.168.1.1</td>
+                <td>Firewall1</td>
+            </tr>
+            <tr>
+                <td>Server2</td>
+                <td>192.168.2.1</td>
+                <td>Server3, Firewall2</td>
+            </tr>
+            <tr>
+                <td>Server3</td>
+                <td>192.168.3.1</td>
+                <td>Firewall3</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <br>
     <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
         <input type="file" name="file" accept=".xlsx" />
         <button type="submit">Generate Diagram</button>
     </form>
-    <!-- form for adding new device to diagram -->
 
+<br><br>
+    <!-- form for adding new device to diagram -->
+    <h3>Add new Device</h3>
     <form id="addDeviceForm">
         <label for="deviceName">Device Name</label>
         <input type="text" id="deviceName" name="deviceName" required>
