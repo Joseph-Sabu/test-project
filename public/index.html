@@ -13,9 +13,30 @@
 </head>
 <body>
     <h1>Network Diagram Visualizer</h1>
+
     <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
         <input type="file" name="file" accept=".xlsx" />
         <button type="submit">Generate Diagram</button>
+    </form>
+    <!-- form for adding new device to diagram -->
+
+    <form id="addDeviceForm">
+        <label for="deviceName">Device Name</label>
+        <input type="text" id="deviceName" name="deviceName" required>
+        
+        <label for="deviceType">Device Type</label>
+        <select name="deviceType" id="deviceType">
+            <option value="server">Server</option>
+            <option value="firewall">Firewall</option>
+        </select>
+        
+        <label for="ipAddress">IP Address</label>
+        <input type="text" id="ipAddress" name="ipAddress" required>
+        
+        <label for="connectsTo">Connects To</label>
+        <select id="connectsTo" name="connectsTo"></select>
+        
+        <button type="button" id="addDeviceButton">Add Device</button>
     </form>
 
     <svg width="800" height="600"></svg>
@@ -25,8 +46,18 @@
             width = +svg.attr("width"),
             height = +svg.attr("height");
 
+            let nodes = [];
+            let links = [];
+
+        function drawDiagram({ nodes: initialNodes, links: initialLinks }) {
+            nodes = initialNodes;
+            links = initialLinks;
+
+            // Update Connects To dropdown
+            updateConnectsToDropdown();
+
+
         // Function to draw the network diagram
-        function drawDiagram({ nodes, links }) {
             svg.selectAll("*").remove();
 
             // Setting up the simulation with forces
@@ -164,6 +195,45 @@
             } else {
                 console.error('Error uploading file:', response.statusText);
             }
+        };
+
+        //function to load connectsTo dropdownlist
+        function updateConnectsToDropdown() {
+            const connectsToDropdown = document.getElementById("connectsTo");
+            connectsToDropdown.innerHTML = '';
+
+            // Populate the dropdown with current node names
+            nodes.forEach(node => {
+                const option = document.createElement("option");
+                option.value = node.id;
+                option.text = node.id;
+                connectsToDropdown.appendChild(option);
+            });
+        }
+
+        // Handling the Add Device button click
+        document.getElementById("addDeviceButton").onclick = function() {
+            const deviceName = document.getElementById("deviceName").value;
+            const deviceType = document.getElementById("deviceType").value;
+            const ipAddress = document.getElementById("ipAddress").value;
+            const connectsTo = document.getElementById("connectsTo").value;
+
+            if (!deviceName || !ipAddress) {
+                alert("Please fill in all fields for the device.");
+                return;
+            }
+
+            // Add the new node and link to the diagram data
+            const newNode = { id: deviceName, ip: ipAddress, type: deviceType };
+            nodes.push(newNode);
+            links.push({ source: deviceName, target: connectsTo, value: 10 });
+
+            // Redraw the diagram with the new node and link
+            drawDiagram({ nodes, links });
+
+            // Reset the form fields
+            document.getElementById("addDeviceForm").reset();
+            updateConnectsToDropdown();
         };
     </script>
 
