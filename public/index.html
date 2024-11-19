@@ -10,6 +10,8 @@
         line { stroke: black; }
         text { font: 10px sans-serif; }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 </head>
 <body>
     <h1>Network Diagram Visualizer</h1>
@@ -70,6 +72,8 @@
         
         <button type="button" id="addDeviceButton">Add Device</button>
     </form>
+
+    <button id="saveAsPdf">Save Diagram as PDF</button>
 
     <svg width="800" height="600"></svg>
 
@@ -267,6 +271,42 @@
             document.getElementById("addDeviceForm").reset();
             updateConnectsToDropdown();
         };
+
+        //save as pdf
+        document.getElementById('saveAsPdf').addEventListener('click', async () => {
+    const svgElement = document.querySelector('svg');
+    const svgRect = svgElement.getBoundingClientRect();
+    
+    // Clone the SVG element for rendering
+    const svgData = new XMLSerializer().serializeToString(svgElement);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Set canvas size to match the SVG dimensions
+    canvas.width = svgRect.width;
+    canvas.height = svgRect.height;
+
+    // Use an image to render the SVG on canvas
+    const img = new Image();
+    img.onload = () => {
+        ctx.drawImage(img, 0, 0);
+        const pdf = new jspdf.jsPDF({
+            orientation: svgRect.width > svgRect.height ? 'landscape' : 'portrait',
+            unit: 'pt',
+            format: [svgRect.width, svgRect.height]
+        });
+
+        // Convert canvas to PNG and add it to the PDF
+        const imgData = canvas.toDataURL('image/png');
+        pdf.addImage(imgData, 'PNG', 0, 0, svgRect.width, svgRect.height);
+
+        // Save the PDF
+        pdf.save('network-diagram.pdf');
+    };
+
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgData);
+});
+
     </script>
 
 </body>
