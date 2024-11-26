@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Diagram Visualizer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/home.css">
+</head>
+<body>
+    <%- include('partials/navbar') %>
+
+    <div class="hero">
+        <h1>Welcome to the Network Diagram Visualizer</h1>
+        <p>Create, visualize, and manage network diagrams with ease.</p>
+        <button class="btn btn-light btn-lg mt-3" onclick="location.href='/login'">Login to get started</button>
+    </div>
+
+    <main>
+        <section class="features">
+            <h2>Why Use Network Diagram Visualizer?</h2>
+            <div class="feature-item">
+                <h4>📁 Upload Your Data</h4>
+                <p>Easily upload Excel files containing network details to generate clear and accurate network diagrams. Our tool processes your data and presents it visually in just seconds.</p>
+            </div>
+            <div class="feature-item">
+                <h4>📊 Visualize Network Structures</h4>
+                <p>See your network come to life with an intuitive, interactive diagram. Explore connections between devices and understand your infrastructure at a glance.</p>
+            </div>
+            <div class="feature-item">
+                <h4>⚡ Add Devices On-the-Fly</h4>
+                <p>Quickly add new devices and connections to your diagram without re-uploading the file. Modify your network as you go for maximum flexibility.</p>
+            </div>
+            <div class="feature-item">
+                <h4>🖨 Save & Share</h4>
+                <p>Export your diagram as a PDF for presentations or documentation. Share it with your team to improve collaboration and understanding.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Network Diagram Visualizer © 2024</p>
+    </footer>
+
+</body>
+</html>

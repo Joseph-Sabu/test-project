@@ -1,0 +1,16 @@
+<link rel="stylesheet" href="/css/header-footer.css">
+<div id="main-header">
+<header><b>Network Diagram Visualizer</b></header>
+</div>
+<nav>
+    <ul>
+        <li><a href="/">Home</a></li>
+        <% if (user) { %>
+            <li><a href="/visualizer">Visualizer</a></li>
+            <li><a href="/logout">Logout</a></li>
+        <% } else { %>
+            <li><a href="/login">Login</a></li>
+            <li><a href="/register">Register</a></li>
+        <% } %>
+    </ul>
+</nav>
